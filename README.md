@@ -252,3 +252,4 @@ simply loop until the condition is satisfied, but that loop is wasteful, since i
     }
 Let's use guarded blocks to create a Producer-Consumer application. This kind of application shares data between two threads: the producer, that creates the data, and the consumer, that does something with it. The two threads communicate using a shared object. Coordination is essential: the consumer thread must not attempt to retrieve the data before the producer thread has delivered it, and the producer thread must not attempt to deliver new data if the consumer hasn't retrieved the old data.
 
+refer to ProducerConsumerExample.java
