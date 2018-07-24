@@ -1,6 +1,6 @@
 import java.util.*;
 
-
+// both wait() and notify() methods are final method of class Object, do not need any object to use it.
 public class Test {
     public static void main(String[] args) {
         Drop drop = new Drop();
