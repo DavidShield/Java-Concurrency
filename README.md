@@ -109,7 +109,9 @@ The join method allows one thread to wait for the completion of another. If t is
 
     t.join();
 causes the current thread to pause execution until t's thread terminates. 
-
+  
+    t.join(int32)
+Blocks the calling thread until the thread represented by this instance terminates or the specified time elapses
 # Synchronization 
 ## Thread Interference
 Interference happens when two operations, running in different threads, but acting on the same data, interleave. This means that the two operations consist of multiple steps, and the sequences of steps overlap.
