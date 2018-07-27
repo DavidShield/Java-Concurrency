@@ -217,8 +217,11 @@ A concurrent application's ability to execute in a timely manner is known as its
 In order for deadlock to occur, four conditions must be true.
 
 *Mutual exclusion - Each resource is either currently allocated to exactly one process or it is available. (Two processes cannot simultaneously control the same resource or be in their critical section).
+
 *Hold and Wait - processes currently holding resources can request new resources.
+
 *No preemption - Once a process holds a resource, it cannot be taken away by another process or the kernel.
+
 *Circular wait - Each process is waiting to obtain a resource which is held by another process.
 and all these condition are satisfied in above diagram.
 
