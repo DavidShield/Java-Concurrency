@@ -258,3 +258,16 @@ simply loop until the condition is satisfied, but that loop is wasteful, since i
 Let's use guarded blocks to create a Producer-Consumer application. This kind of application shares data between two threads: the producer, that creates the data, and the consumer, that does something with it. The two threads communicate using a shared object. Coordination is essential: the consumer thread must not attempt to retrieve the data before the producer thread has delivered it, and the producer thread must not attempt to deliver new data if the consumer hasn't retrieved the old data.
 
 refer to ProducerConsumerExample.java
+
+## Strategy for defining Immutable Objects
+1. Don't provide "setter" methods — methods that modify fields or objects referred to by fields.
+
+2. Make all fields final and private.
+
+3. Don't allow subclasses to override methods. The simplest way to do this is to declare the class as final. A more sophisticated approach is to make the constructor private and construct instances in factory methods.
+
+4. If the instance fields include references to mutable objects, don't allow those objects to be changed:
+*Don't provide methods that modify the mutable objects.
+*Don't share references to the mutable objects. Never store references to external, mutable objects passed to the constructor; if necessary, create copies, and store references to the copies. Similarly, create copies of your internal mutable objects when necessary to avoid returning the originals in your methods.
+
+## Fair Lock and Unfair Lock
