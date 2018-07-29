@@ -267,7 +267,114 @@ refer to ProducerConsumerExample.java
 3. Don't allow subclasses to override methods. The simplest way to do this is to declare the class as final. A more sophisticated approach is to make the constructor private and construct instances in factory methods.
 
 4. If the instance fields include references to mutable objects, don't allow those objects to be changed:
+
 *Don't provide methods that modify the mutable objects.
+
 *Don't share references to the mutable objects. Never store references to external, mutable objects passed to the constructor; if necessary, create copies, and store references to the copies. Similarly, create copies of your internal mutable objects when necessary to avoid returning the originals in your methods.
+
+## Lock Objects
+As with implicit locks, only one thread can own a Lock object at a time. Lock objects also support a wait/notify mechanism, through their associated Condition objects.
+
+The biggest advantage of Lock objects over implicit locks is their ability to back out of an attempt to acquire a lock. The tryLock method backs out if the lock is not available immediately or before a timeout expires (if specified). The lockInterruptibly method backs out if another thread sends an interrupt before the lock is acquired.
+
+## Executor
+The Executor interface provides a single method, execute, designed to be a drop-in replacement for a common thread-creation idiom. If r is a Runnable object, and e is an Executor object you can replace
+
+(new Thread(r)).start();
+with
+
+e.execute(r);
+
+However, the definition of execute is less specific. The low-level idiom creates a new thread and launches it immediately. Depending on the Executor implementation, execute may do the same thing, but is more likely to use an existing worker thread to run r, or to place r in a queue to wait for a worker thread to become available.
+
+The executor implementations in java.util.concurrent are designed to make full use of the more advanced ExecutorService and ScheduledExecutorService interfaces, although they also work with the base Executor interface.
+
+## Thread Pools
+thread pools, which consist of worker threads.
+
+Using worker threads minimizes the overhead due to thread creation. Thread objects use a significant amount of memory, and in a large-scale application, allocating and deallocating many thread objects creates a significant memory management overhead.
+
+One common type of thread pool is the fixed thread pool. This type of pool always has a specified number of threads running; if a thread is somehow terminated while it is still in use, it is automatically replaced with a new thread. Tasks are submitted to the pool via an internal queue, which holds extra tasks whenever there are more active tasks than threads.
+
+An important advantage of the fixed thread pool is that applications using it degrade gracefully. To understand this, consider a web server application where each HTTP request is handled by a separate thread. If the application simply creates a new thread for every new HTTP request, and the system receives more requests than it can handle immediately, the application will suddenly stop responding to all requests when the overhead of all those threads exceed the capacity of the system. With a limit on the number of the threads that can be created, the application will not be servicing HTTP requests as quickly as they come in, but it will be servicing them as quickly as the system can sustain.
+
+A simple way to create an executor that uses a fixed thread pool is to invoke the newFixedThreadPool factory method in java.util.concurrent.Executors
+
+## Fork/Join
+It is designed for work that can be broken into smaller pieces recursively. The goal is to use all the available processing power to enhance the performance of your application.
+
+1. Create a task that represents all of the work to be done.
+
+// source image pixels are in src
+// destination image pixels are in dst
+ForkBlur fb = new ForkBlur(src, 0, src.length, dst);
+
+2. Create the ForkJoinPool that will run the task.
+
+ForkJoinPool pool = new ForkJoinPool();
+
+3. Run the task.
+
+pool.invoke(fb);
+
+### Atomic Variables
+The java.util.concurrent.atomic package defines classes that support atomic operations on single variables. All classes have get and set methods that work like reads and writes on volatile variables.
+
+Example: the Counter class we originally used to demonstrate thread interference:
+
+    class Counter {
+        private int c = 0;
+
+        public void increment() {
+            c++;
+        }
+
+        public void decrement() {
+            c--;
+        }
+
+        public int value() {
+            return c;
+        }
+
+    }
+
+One way to make Counter safe from thread interference is to make its methods synchronized, as in SynchronizedCounter:
+
+    class SynchronizedCounter {
+        private int c = 0;
+
+        public synchronized void increment() {
+            c++;
+        }
+
+        public synchronized void decrement() {
+            c--;
+        }
+
+        public synchronized int value() {
+            return c;
+        }
+    }
+     
+For this simple class, synchronization is an acceptable solution. But for a more complicated class, we might want to avoid the liveness impact of unnecessary synchronization. Replacing the int field with an AtomicInteger allows us to prevent thread interference without resorting to synchronization, as in AtomicCounter:
+
+import java.util.concurrent.atomic.AtomicInteger;
+
+    class AtomicCounter {
+        private AtomicInteger c = new AtomicInteger(0);
+
+        public void increment() {
+            c.incrementAndGet();
+        }
+
+        public void decrement() {
+            c.decrementAndGet();
+        }
+
+        public int value() {
+            return c.get();
+        }
+    }
 
 ## Fair Lock and Unfair Lock
